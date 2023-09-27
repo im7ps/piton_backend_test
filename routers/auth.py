@@ -8,7 +8,7 @@ from database import SessionLocal
 from models import Users, CreateUserRequest, Token
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-import jwt
+from jose import jwt, JWTError
 from services import get_db, create_router
 from auth_utils import verify_email
 
@@ -32,9 +32,9 @@ db_dependency = Annotated[Session, Depends(get_db)]
 def authenticate_user(username: str, password: str, db):
     user = db.query(Users).filter(Users.username == username).first()
     if not user:
-        return None
+        return False
     if not bcrypt_context.verify(password, user.hashed_password):
-        return None
+        return False
     return user
 
 
@@ -54,7 +54,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail='Could not validate user.')
         return {'username': username, 'id': user_id, 'user_role': user_role}
-    except jwt.PyJWTError:
+    except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Could not validate user.')
 
