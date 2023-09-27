@@ -12,15 +12,6 @@ class CreateUserRequest(BaseModel):
     last_name: str
     password: str
     role: str
-    accommodationType: bool
-    currentCity: str
-    currentState: str
-    currentStreet: str
-    currentZone: str
-    desiredCity: str
-    desiredState: str
-    desiredStreet: str
-    desiredZone: str
 
 class Token(BaseModel):
     access_token: str
