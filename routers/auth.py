@@ -72,15 +72,6 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         first_name=create_user_request.first_name,
         last_name=create_user_request.last_name,
         role=create_user_request.role,
-        accommodationType=create_user_request.accommodationType,
-        currentCity=create_user_request.currentCity,
-        currentState=create_user_request.currentState,
-        currentStreet=create_user_request.currentStreet,
-        currentZone=create_user_request.currentZone,
-        desiredCity=create_user_request.desiredCity,
-        desiredState=create_user_request.desiredState,
-        desiredStreet=create_user_request.desiredStreet,
-        desiredZone=create_user_request.desiredZone,
         hashed_password=bcrypt_context.hash(create_user_request.password),
         is_active=True
     )
