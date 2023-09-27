@@ -60,12 +60,13 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
+async def create_user(db: db_dependency,
+                      create_user_request: CreateUserRequest):
+    #da inserire verifica email non ancora in uso
     try:
         verify_email(db, create_user_request.email)
     except:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Email not valid.')
-
     create_user_model = Users(
         email=create_user_request.email,
         username=create_user_request.username,
@@ -90,3 +91,4 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     token = create_access_token(user.username, user.id, user.role, timedelta(minutes=20))
 
     return {'access_token': token, 'token_type': 'bearer'}
+
