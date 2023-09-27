@@ -12,6 +12,10 @@ from jose import jwt, JWTError
 from services import get_db, create_router
 from auth_utils import verify_email
 
+import tkinter as tk
+from tkinter import messagebox
+
+
 router = create_router(prefix='/auth', tags=['auth'])
 
 
@@ -22,6 +26,7 @@ ALGORITHM = 'HS256'
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
 
+
 class CreateUserRequest(BaseModel):
     username: str
     email: str
@@ -29,6 +34,8 @@ class CreateUserRequest(BaseModel):
     last_name: str
     password: str
     role: str
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -40,15 +47,20 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 def authenticate_user(username: str, password: str, db):
     user = db.query(Users).filter(Users.username == username).first()
+    messagebox.showinfo("Titolo dell'Alert", "Questo è il testo dell'alert!")
     if not user:
         return False
     if not bcrypt_context.verify(password, user.hashed_password):
         return False
     return user
+
+
 def create_access_token(username: str, user_id: int, role: str, expires_delta: timedelta):
     expires = datetime.utcnow() + expires_delta
     encode = {'sub': username, 'id': user_id, 'role': role, 'exp': expires}
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -62,6 +74,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Could not validate user.')
+
+
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency,
                       create_user_request: CreateUserRequest):
@@ -81,9 +95,12 @@ async def create_user(db: db_dependency,
     )
     db.add(create_user_model)
     db.commit()
+
+
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  db: db_dependency):
+    messagebox.showinfo("Titolo dell'Alert", "Questo è il testo dell'alert!2")
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
