@@ -32,8 +32,10 @@ db_dependency = Annotated[Session, Depends(get_db)]
 def authenticate_user(username: str, password: str, db):
     user = db.query(Users).filter(Users.username == username).first()
     if not user:
+        print("AUTHENTICATE USER NOT WORKING\n")
         return False
     if not bcrypt_context.verify(password, user.hashed_password):
+        print("AUTHENTICATE USER NOT WORKING 2\n")
         return False
     return user
 
@@ -60,13 +62,12 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_user(db: db_dependency,
-                      create_user_request: CreateUserRequest):
-    #da inserire verifica email non ancora in uso
+async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     try:
         verify_email(db, create_user_request.email)
     except:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Email not valid.')
+
     create_user_model = Users(
         email=create_user_request.email,
         username=create_user_request.username,
@@ -84,6 +85,7 @@ async def create_user(db: db_dependency,
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  db: db_dependency):
+    print("asdasdasd\n")
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -91,4 +93,3 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     token = create_access_token(user.username, user.id, user.role, timedelta(minutes=20))
 
     return {'access_token': token, 'token_type': 'bearer'}
-
