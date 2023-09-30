@@ -12,9 +12,6 @@ from jose import jwt, JWTError
 from services import get_db, create_router
 from auth_utils import verify_email
 
-import tkinter as tk
-from tkinter import messagebox
-
 
 router = create_router(prefix='/auth', tags=['auth'])
 
