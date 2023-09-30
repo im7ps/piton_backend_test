@@ -44,7 +44,6 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 def authenticate_user(username: str, password: str, db):
     user = db.query(Users).filter(Users.username == username).first()
-    messagebox.showinfo("Titolo dell'Alert", "Questo è il testo dell'alert!")
     if not user:
         return False
     if not bcrypt_context.verify(password, user.hashed_password):
@@ -97,7 +96,6 @@ async def create_user(db: db_dependency,
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  db: db_dependency):
-    messagebox.showinfo("Titolo dell'Alert", "Questo è il testo dell'alert!2")
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
